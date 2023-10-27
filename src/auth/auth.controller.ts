@@ -8,7 +8,7 @@ export class AuthController {
   @Get('github')
   @UseGuards(AuthGuard('github'))
   githubLogin() {
-    // Esta ruta iniciará el proceso de autenticación de GitHub
+    // Route for github authentication
   }
 
   @Get('github/callback')

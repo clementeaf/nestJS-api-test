@@ -19,9 +19,6 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     _refreshToken: string,
     profile: Profile,
   ) {
-    // Aquí puedes realizar lógica para validar o registrar al usuario en tu sistema
-    // profile contiene la información del usuario obtenida de GitHub
-    // Debes decidir cómo manejar esta información y si el usuario tiene acceso a tu aplicación
     return profile;
   }
 }

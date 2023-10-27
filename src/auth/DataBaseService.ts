@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class DataBaseService {
-  // Simulación de una base de datos de usuarios
+  // User database simulation
   static users: {
     find(arg0: (user: any) => boolean): unknown;
     length: number;

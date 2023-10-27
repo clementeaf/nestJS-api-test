@@ -16,7 +16,6 @@ export class GithubApiService {
 
       ws.on('message', (message) => {
         console.log(`Received: ${message}`);
-        // Puedes procesar y reaccionar a los mensajes aquí si es necesario.
       });
 
       ws.on('error', (error) => {

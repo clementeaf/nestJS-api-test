@@ -8,7 +8,7 @@ describe('GitHubApiController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [GithubApiController],
-      providers: [GithubApiService], // Asegúrate de incluir el servicio en el módulo de pruebas
+      providers: [GithubApiService],
     }).compile();
 
     controller = module.get<GithubApiController>(GithubApiController);
