@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io';
 @WebSocketGateway()
 export class WebsocketGateway {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   handleConnection(client: Socket) {
     console.log(`Cliente conectado: ${client.id}`);

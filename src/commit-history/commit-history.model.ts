@@ -4,22 +4,22 @@ import { Document } from 'mongoose';
 @Schema()
 export class CommitHistory extends Document {
   @Prop()
-  sha: string;
+  sha!: string;
 
   @Prop()
-  authorName: string;
+  authorName!: string;
 
   @Prop()
-  authorLogin: string;
+  authorLogin!: string;
 
   @Prop()
-  message: string;
+  message!: string;
 
   @Prop()
-  url: string;
+  url!: string;
 
   @Prop()
-  date: Date;
+  date!: Date;
 }
 
 export const CommitHistorySchema = SchemaFactory.createForClass(CommitHistory);
