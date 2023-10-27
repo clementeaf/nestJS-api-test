@@ -14,4 +14,8 @@ export class WebsocketGateway {
     console.log(`Mensaje recibido de ${client.id}: ${message}`);
     this.server.emit('nuevoMensaje', message);
   }
+
+  handleEvent(data: any) {
+    this.server.emit('evento', data);
+  }
 }
