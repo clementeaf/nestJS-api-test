@@ -1,10 +1,17 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { CommitHistoryModule } from './commit-history/commit-history.module';
+import { WebsocketModule } from './websocket/websocket.module';
+import { GithubApiModule } from './github-api/github-api.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    MongooseModule.forRoot(
+      'mongodb+srv://clemente:clemente@blazorappdb.j8v7ctn.mongodb.net/blazorappdb',
+    ),
+    CommitHistoryModule,
+    WebsocketModule,
+    GithubApiModule,
+  ],
 })
 export class AppModule {}
