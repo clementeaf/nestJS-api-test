@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { OnModuleInit } from '@nestjs/common';
 import {
   ConnectedSocket,
@@ -22,11 +23,11 @@ export class WebsocketGateway
     console.log('Server initialization');
   }
 
-  handleConnection(client: Socket) {
+  handleConnection() {
     console.log(`Cliente conectado`);
   }
 
-  handleDisconnect(client: Socket) {
+  handleDisconnect() {
     console.log(`Cliente conectado`);
   }
 
