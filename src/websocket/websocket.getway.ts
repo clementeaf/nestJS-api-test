@@ -1,4 +1,9 @@
-import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
+  MessageBody,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway()
@@ -10,12 +15,12 @@ export class WebsocketGateway {
     console.log(`Cliente conectado: ${client.id}`);
   }
 
-  handleMessage(client: Socket, message: string) {
-    console.log(`Mensaje recibido de ${client.id}: ${message}`);
-    this.server.emit('nuevoMensaje', message);
-  }
-
   handleEvent(data: any) {
     this.server.emit('evento', data);
+  }
+
+  @SubscribeMessage('message')
+  handleMessage(@MessageBody() data: string): void {
+    this.server.emit('message', data);
   }
 }
