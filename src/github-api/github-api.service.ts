@@ -8,7 +8,7 @@ export class GithubApiService {
   private wss: Server;
 
   constructor() {
-    this.octokit = new Octokit({ request: { fetch } });
+    this.octokit = new Octokit();
     this.wss = new Server({ noServer: true });
 
     this.wss.on('connection', (ws) => {
