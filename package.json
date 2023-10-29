@@ -11,7 +11,7 @@
     "start": "nest start",
     "dev": "nodemon src/main.ts",
     "start:staging": "node src/github-api.js",
-    "start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js --watch",
+    "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -19,11 +19,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "m:gen:dev": "export NODE_ENV=develop && npm run orm:init migration:generate",
-    "m:run:dev": "export NODE_ENV=develop && npm run orm:init migration:run",
-    "m:gen": "export NODE_ENV=production && nom run orm:init migration:generate",
-    "m:run": "export NODE_ENV=production && npm run orm:init migration:run"
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^10.2.7",
