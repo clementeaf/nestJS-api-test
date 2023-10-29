@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
 import { Server } from 'ws';
-import fetch from 'node-fetch';
 
 @Injectable()
 export class GithubApiService {
