@@ -7,11 +7,13 @@ export class GithubApiController {
 
   @Get('repo-info')
   async getRepoInfo() {
-    return this.githubApiService.getRepoInfo();
+    const repoInfo = await this.githubApiService.getRepoInfo();
+    return repoInfo;
   }
 
   @Get('commits')
   async getCommits() {
-    return this.githubApiService.getCommits();
+    const commits = await this.githubApiService.getCommits();
+    return commits;
   }
 }
