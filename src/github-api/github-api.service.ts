@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
 import { Server } from 'ws';
+import fetch from 'node-fetch';
 
 @Injectable()
 export class GithubApiService {
@@ -8,7 +9,7 @@ export class GithubApiService {
   private wss: Server;
 
   constructor() {
-    this.octokit = new Octokit();
+    this.octokit = new Octokit({ request: { fetch } });
     this.wss = new Server({ noServer: true });
 
     this.wss.on('connection', (ws) => {
