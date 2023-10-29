@@ -21,11 +21,7 @@ async function bootstrap() {
     .build();
 
   app.enableCors({
-    origin: [
-      'http://localhost:4000',
-      'http://192.168.1.81:4000',
-      'https://react-monitoring-e49b2.web.app',
-    ],
+    origin: ['http://localhost:4000', 'https://react-monitoring-e49b2.web.app'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
