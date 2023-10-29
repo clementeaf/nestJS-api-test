@@ -36,7 +36,6 @@ export class WebsocketGateway
     @MessageBody() data: string,
     @ConnectedSocket() client: Socket,
   ) {
-    // Handle received message
-    this.server.emit('message', data); // Broadcast the message to all connected clients
+    this.server.emit('message', data);
   }
 }
