@@ -5,8 +5,6 @@
 ## Features
 
 - GitHub Integration: Monitor GitHub repositories and receive real-time updates on new commits.
-- Authentication: Secure your API endpoints with OAuth 2.0 authentication using GitHub as an identity provider.
-- WebSockets: Get real-time notifications about new commits using WebSocket communication.
 - Swagger API Documentation: Explore and interact with the API using the built-in Swagger UI.
 
 ## Table of Contents
@@ -18,7 +16,6 @@
 - Usage
 - Endpoints
 - Authentication
-- WebSocket Integration
 - Prerequisites
   
 - Before you begin, ensure you have met the following requirements:
