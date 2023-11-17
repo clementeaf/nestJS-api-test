@@ -8,9 +8,11 @@ import {
 } from '@nestjs/common';
 import { GitHubConnection } from '../../infrastructure/github/github/github';
 import { CommitDto, RepoInfoDto } from './github.dto/github.dto';
+import { Subject } from 'rxjs';
 @Injectable()
 export class ApplicationGithubService {
   private readonly gitHubConnection: GitHubConnection;
+  private commitsSubject = new Subject<CommitDto[]>();
 
   constructor() {
     this.gitHubConnection = new GitHubConnection();
@@ -88,6 +90,39 @@ export class ApplicationGithubService {
     }
   }
 
+  async getCommitsAndNotify(): Promise<CommitDto[]> {
+    const owner = 'clementeaf';
+    const repo = 'nestJS-api-test';
+    try {
+      const commits = await this.gitHubConnection.getCommits(owner, repo);
+
+      if (!commits) {
+        throw new NotFoundException('Commits not found');
+      }
+
+      const commitsDto: CommitDto[] = commits.map(
+        (commit: { sha: string }) => ({
+          sha: commit.sha,
+        }),
+      );
+
+      // Notify the subscribers about the commits update
+      this.commitsSubject.next(commitsDto);
+
+      return commitsDto;
+    } catch (error) {
+      console.error(error);
+
+      if (error instanceof Error) {
+        this.handleError(error, 'Error fetching commits');
+      } else {
+        throw new InternalServerErrorException(
+          'Unexpected error fetching commits',
+        );
+      }
+    }
+  }
+
   /**
    * Handles errors in the GitHub service by logging the error and throwing
    * an InternalServerErrorException with a custom error message.
@@ -103,5 +138,10 @@ export class ApplicationGithubService {
      * Throws an InternalServerErrorException with a custom error message.
      */
     throw new InternalServerErrorException(message);
+  }
+
+  // Method to subscribe to commit updates
+  getCommitsUpdates() {
+    return this.commitsSubject.asObservable();
   }
 }

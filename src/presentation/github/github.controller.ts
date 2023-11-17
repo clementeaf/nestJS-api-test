@@ -1,6 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
-import { SubscribeMessage } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import {
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
+import { Socket, Server } from 'socket.io';
 import { ApplicationGithubService } from '../../application/github/github.service';
 import {
   CommitDto,
@@ -13,10 +19,36 @@ import {
  * - GET /github/repo-info: Retrieve information about the Github repository.
  * - GET /github/commits: Retrieve a list of commits from the Github repository.
  */
+@WebSocketGateway()
 @Controller('github')
-export class GithubController {
-  constructor(private readonly githubService: ApplicationGithubService) {}
+export class GithubController
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
+  @WebSocketServer() server: Server | undefined;
 
+  constructor(private readonly githubService: ApplicationGithubService) {
+    // Subscribe to commit updates
+    this.githubService.getCommitsUpdates().subscribe((commits: CommitDto[]) => {
+      // Notify connected clients about the commits update
+      if (this.server) {
+        this.server.emit('commitsUpdate', commits);
+      }
+    });
+  }
+
+  private clients: Socket[] = [];
+
+  handleConnection(client: Socket) {
+    this.clients.push(client);
+  }
+
+  handleDisconnect(client: Socket) {
+    this.clients = this.clients.filter((c) => c.id !== client.id);
+  }
+
+  setServer(server: Server) {
+    this.server = server;
+  }
   /**
    * Endpoint: GET /github/repo-info
    * Retrieve information about the Github repository.
@@ -46,5 +78,11 @@ export class GithubController {
     };
 
     client.emit(response.event, response);
+  }
+
+  notifyCommitsUpdate(commits: any[]) {
+    if (this.server) {
+      this.server.emit('commitsUpdate', commits);
+    }
   }
 }
