@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { GitHubConnection } from '../../infrastructure/github/github/github';
 import { CommitDto, RepoInfoDto } from './github.dto/github.dto';
-
 @Injectable()
 export class ApplicationGithubService {
   private readonly gitHubConnection: GitHubConnection;
@@ -41,9 +40,14 @@ export class ApplicationGithubService {
       return repoInfoDto;
     } catch (error) {
       console.error(error);
-      throw new InternalServerErrorException(
-        'Error fetching repository information',
-      );
+
+      if (error instanceof Error) {
+        this.handleError(error, 'Error fetching repository information');
+      } else {
+        throw new InternalServerErrorException(
+          'Unexpected error fetching repository information',
+        );
+      }
     }
   }
 
@@ -63,22 +67,41 @@ export class ApplicationGithubService {
       if (!commits) {
         throw new NotFoundException('Commits not found');
       }
-      interface CommitObject {
-        sha: string;
-      }
 
-      const commitsDto: CommitDto[] = (commits || []).map(
-        (commit: CommitObject) => {
-          return {
-            sha: commit.sha,
-          };
-        },
+      const commitsDto: CommitDto[] = commits.map(
+        (commit: { sha: string }) => ({
+          sha: commit.sha,
+        }),
       );
 
       return commitsDto;
     } catch (error) {
       console.error(error);
-      throw new InternalServerErrorException('Error fetching commits');
+
+      if (error instanceof Error) {
+        this.handleError(error, 'Error fetching commits');
+      } else {
+        throw new InternalServerErrorException(
+          'Unexpected error fetching commits',
+        );
+      }
     }
+  }
+
+  /**
+   * Handles errors in the GitHub service by logging the error and throwing
+   * an InternalServerErrorException with a custom error message.
+   *
+   * @param error - The error object.
+   * @param message - Custom error message to include in the exception.
+   * @throws {InternalServerErrorException} Always throws an InternalServerErrorException.
+   */
+  private handleError(error: Error, message: string): never {
+    console.error(error);
+
+    /**
+     * Throws an InternalServerErrorException with a custom error message.
+     */
+    throw new InternalServerErrorException(message);
   }
 }
