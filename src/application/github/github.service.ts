@@ -63,12 +63,17 @@ export class ApplicationGithubService {
       if (!commits) {
         throw new NotFoundException('Commits not found');
       }
+      interface CommitObject {
+        sha: string;
+      }
 
-      const commitsDto: CommitDto[] = (commits || []).map((commit) => {
-        return {
-          sha: commit.sha,
-        };
-      });
+      const commitsDto: CommitDto[] = (commits || []).map(
+        (commit: CommitObject) => {
+          return {
+            sha: commit.sha,
+          };
+        },
+      );
 
       return commitsDto;
     } catch (error) {
