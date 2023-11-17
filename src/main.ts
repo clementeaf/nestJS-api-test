@@ -4,37 +4,55 @@ import { AppModule } from './app.module';
 import { WsAdapter } from '@nestjs/platform-ws';
 import * as dotenv from 'dotenv';
 
-declare const module: any;
+// Define the module type with optional hot module replacement
+declare const module: NodeModule & {
+  hot?: {
+    accept(path?: string, callback?: () => void): void;
+    dispose(callback: (data: any) => void): void;
+  };
+};
 
+/**
+ * Bootstrap the NestJS application.
+ */
 async function bootstrap() {
+  // Load environment variables from .env file
   dotenv.config();
 
+  // Create the NestJS application instance
   const app = await NestFactory.create(AppModule);
+
+  // Use WebSocket adapter for the application
   app.useWebSocketAdapter(new WsAdapter(app));
 
-  const config = new DocumentBuilder()
-    .setTitle('Github-monitoring API')
-    .setDescription(
-      'API para el monitoreo de actividades de repositorio en GitHub',
-    )
-    .setVersion('1.0')
-    .build();
-
+  // Enable CORS with specific origins, methods, and credentials
   app.enableCors({
     origin: ['http://localhost:4000', 'https://react-monitoring-e49b2.web.app'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api-docs', app, document);
+  // Configure Swagger documentation
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Github-monitoring API')
+    .setDescription('API for monitoring repository activities on GitHub')
+    .setVersion('1.0')
+    .build();
 
-  await app.listen(3000, '0.0.0.0');
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api-docs', app, swaggerDocument);
 
+  // Start the application on the specified port and host
+  const PORT = process.env.PORT || 3000;
+  const HOST = '0.0.0.0';
+  await app.listen(PORT, HOST);
+
+  // Hot module replacement setup
   if (module.hot) {
     module.hot.accept();
     module.hot.dispose(() => app.close());
   }
 }
 
+// Invoke the bootstrap function to start the application
 bootstrap();
