@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
-import { Github } from './github/github';
-
+import { GitHubConnection } from './github/github';
+/**
+ * Module for handling GitHub-related functionalities and connections.
+ */
 @Module({
-  providers: [Github]
+  providers: [GitHubConnection],
 })
 export class GithubModule {}
