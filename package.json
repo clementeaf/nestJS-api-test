@@ -36,6 +36,7 @@
     "@octokit/core": "^5.0.1",
     "@octokit/rest": "^20.0.2",
     "axios": "1.5.1",
+    "class-validator": "^0.14.0",
     "dotenv": "^16.3.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.6.3",
