@@ -39,14 +39,12 @@ export class GithubController {
 
   @SubscribeMessage('subscribeToCommits')
   handleSubscribeToCommits(client: Socket): void {
-    // Puedes personalizar la respuesta según tus necesidades
     const response = {
       event: 'subscribedToCommits',
       message: 'You are now subscribed to new commits.',
       timestamp: new Date().toISOString(),
     };
 
-    // Emitir la respuesta al cliente
     client.emit(response.event, response);
   }
 }
