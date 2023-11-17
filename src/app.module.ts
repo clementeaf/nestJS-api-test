@@ -9,9 +9,6 @@ import { ApplicationModule } from './application/application.module';
     // Load environment variables using the ConfigModule
     ConfigModule.forRoot(),
 
-    // Import the GithubApiModule to enable GitHub API-related features
-    // GithubApiModule,
-
     // Import the ApplicationModule where your application's core functionality is defined
     ApplicationModule,
 
