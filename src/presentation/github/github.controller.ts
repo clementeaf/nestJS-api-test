@@ -1,4 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
+import { SubscribeMessage } from '@nestjs/websockets';
+import { Socket } from 'socket.io';
 import { ApplicationGithubService } from '../../application/github/github.service';
 import {
   CommitDto,
@@ -33,5 +35,18 @@ export class GithubController {
   @Get('commits')
   async getCommits(): Promise<CommitDto[]> {
     return this.githubService.getCommits();
+  }
+
+  @SubscribeMessage('subscribeToCommits')
+  handleSubscribeToCommits(client: Socket): void {
+    // Puedes personalizar la respuesta según tus necesidades
+    const response = {
+      event: 'subscribedToCommits',
+      message: 'You are now subscribed to new commits.',
+      timestamp: new Date().toISOString(),
+    };
+
+    // Emitir la respuesta al cliente
+    client.emit(response.event, response);
   }
 }
