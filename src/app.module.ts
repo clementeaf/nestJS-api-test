@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { PresentationModule } from './presentation/presentation.module';
-import { InfrastructureModule } from './infrastructure/infrastructure.module';
-import { ApplicationModule } from './application/application.module';
+import { ApplicationModule } from './application/GithubApplicationModule';
+import { GithubPresentationModule } from './presentation/GithubPresentationModule';
+import { InfrastructureApplicationModule } from './infrastructure/infrastructure.module';
 
 @Module({
   imports: [
@@ -13,10 +13,10 @@ import { ApplicationModule } from './application/application.module';
     ApplicationModule,
 
     // Import the InfrastructureModule to handle low-level services like database connections
-    InfrastructureModule,
+    InfrastructureApplicationModule,
 
     // Import the PresentationModule where your controllers and application's HTTP layer are defined
-    PresentationModule,
+    GithubPresentationModule,
   ],
 })
 export class AppModule {}

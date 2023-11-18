@@ -6,13 +6,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { GitHubConnection } from '../../infrastructure/github/github/github';
-import {
-  CommitAuthorDto,
-  CommitDto,
-  RepoInfoDto,
-} from './github.dto/github.dto';
 import { Subject } from 'rxjs';
+import { GitHubConnection } from '../../../infrastructure/github/github/github';
+import { CommitAuthorDto, CommitDto, RepoInfoDto } from '../dto/github.dto';
+
 @Injectable()
 export class ApplicationGithubService {
   private readonly gitHubConnection: GitHubConnection;
@@ -67,7 +64,7 @@ export class ApplicationGithubService {
    * @throws {NotFoundException} If commits are not found.
    * @throws {InternalServerErrorException} If an internal server error occurs.
    */
-  async getCommits(): Promise<CommitDto[]> {
+  async getCommits(): Promise<any[]> {
     try {
       const commits = await this.gitHubConnection.getCommits(
         this.owner,
@@ -77,17 +74,20 @@ export class ApplicationGithubService {
       if (!commits) {
         throw new NotFoundException('Commits not found');
       }
+      const commitDtos: CommitDto[] = commits.map((commit) => {
+        return {
+          sha: commit.sha,
+          commit: {
+            author: {
+              name: commit.commit.author.name,
+              email: commit.commit.author.email,
+              date: commit.commit.author.date,
+            },
+          },
+        } as CommitDto;
+      });
 
-      const commitsDto: CommitDto[] = commits.map((commit) => ({
-        sha: commit.sha,
-        author: {
-          name: this.authorDto.name,
-          email: this.authorDto.email,
-          date: this.authorDto.date,
-        },
-      }));
-
-      return commitsDto;
+      return commitDtos;
     } catch (error) {
       console.error(error);
 
@@ -101,70 +101,62 @@ export class ApplicationGithubService {
     }
   }
 
+  /**
+   * Fetches commits from the GitHub API, notifies subscribers about updates,
+   * and returns a list of CommitDto objects.
+   *
+   * @returns {Promise<CommitDto[]>} List of commits.
+   * @throws {NotFoundException} If commits are not found.
+   * @throws {InternalServerErrorException} If an unexpected error occurs.
+   */
   async getCommitsAndNotify(): Promise<CommitDto[]> {
+    // GitHub repository information
     const owner = 'clementeaf';
     const repo = 'nestJS-api-test';
-    try {
-      const commits = await this.gitHubConnection.getCommits(
-        this.owner,
-        this.repo,
-      );
 
-      if (!commits) {
+    try {
+      // Fetch commits from the GitHub API
+      const commits = await this.gitHubConnection.getCommits(owner, repo);
+
+      // Check if commits are not found
+      if (!commits || commits.length === 0) {
         throw new NotFoundException('Commits not found');
       }
 
-      const authorDto = new CommitAuthorDto();
-
-      const commitsDto: CommitDto[] = commits.map((commit) => ({
-        sha: commit.sha,
-        author: {
-          name: this.authorDto.name,
-          email: this.authorDto.email,
-          date: this.authorDto.date,
-        },
-      }));
+      // Map GitHub commits to CommitDto objects
+      const commitDtos: CommitDto[] = commits.map((commit) => {
+        return {
+          sha: commit.sha,
+          commit: {
+            author: {
+              name: commit.commit.author.name,
+              email: commit.commit.author.email,
+              date: commit.commit.author.date,
+            },
+          },
+        } as CommitDto;
+      });
 
       /**
-       * Notify the subscribers about the commits update
+       * Notify the subscribers about the commits update.
+       * This ensures that subscribers are informed of the latest commits.
        */
-      this.commitsSubject.next(commitsDto);
+      this.commitsSubject.next(commitDtos);
 
-      return commitsDto;
+      // Return the list of CommitDto objects
+      return commitDtos;
     } catch (error) {
+      // Handle errors
+
       console.error(error);
 
+      // If it's a standard error, log and handle it
       if (error instanceof Error) {
         this.handleError(error, 'Error fetching commits');
       } else {
+        // If it's an unexpected error, throw an InternalServerErrorException
         throw new InternalServerErrorException(
           'Unexpected error fetching commits',
-        );
-      }
-    }
-  }
-
-  //Solo prueba
-  async getCommitsWithDetails(): Promise<any[]> {
-    try {
-      const commits = await this.gitHubConnection.getCommitsWithDetails(
-        this.owner,
-        this.repo,
-      );
-
-      if (!commits) {
-        throw new NotFoundException('Commits not found');
-      }
-
-      return commits;
-    } catch (error) {
-      console.error(error);
-
-      if (error instanceof Error) {
-        this.handleError(error, 'Error fetching commits with details');
-      } else {
-        throw new InternalServerErrorException(
-          'Unexpected error fetching commits with details',
         );
       }
     }

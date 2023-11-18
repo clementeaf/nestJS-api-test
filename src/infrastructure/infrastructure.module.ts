@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { GithubModule } from './github/github.module';
+import { GithubApplicationModule } from './github/GithubInfrastructureModule';
 
 @Module({
-  imports: [GithubModule],
+  imports: [GithubApplicationModule],
 })
-export class InfrastructureModule {}
+export class InfrastructureApplicationModule {}

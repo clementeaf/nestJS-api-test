@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { GithubController } from './github/github.controller';
-import { ApplicationGithubService } from '../application/github/github.service';
+import { ApplicationGithubService } from '../application/github/github/github.service';
 
 /**
  * Presentation module for organizing controllers related to Github presentation.
@@ -10,4 +10,4 @@ import { ApplicationGithubService } from '../application/github/github.service';
   controllers: [GithubController],
   providers: [ApplicationGithubService],
 })
-export class PresentationModule {}
+export class GithubPresentationModule {}

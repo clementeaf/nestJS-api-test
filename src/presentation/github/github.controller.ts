@@ -12,11 +12,11 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { ApplicationGithubService } from '../../application/github/github.service';
 import {
   CommitDto,
   RepoInfoDto,
-} from '../../application/github/github.dto/github.dto';
+} from '../../application/github/dto/github.dto';
+import { ApplicationGithubService } from '../../application/github/github/github.service';
 
 /**
  * Controller responsible for handling Github-related HTTP requests.
@@ -102,11 +102,6 @@ export class GithubController
         );
       }
     }
-  }
-
-  @Get('commits-with-details')
-  async getCommitsWithDetails(): Promise<any[]> {
-    return this.githubService.getCommitsWithDetails();
   }
 
   @SubscribeMessage('subscribeToCommits')

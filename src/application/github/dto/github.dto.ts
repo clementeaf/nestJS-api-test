@@ -1,10 +1,4 @@
-import { Type } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsObject,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { RepoInfo, CommitAuthor, Commit } from './interfaces.dto';
 
 /**
@@ -35,20 +29,15 @@ class CommitAuthorDto implements CommitAuthor {
   @IsNotEmpty({ message: 'Author date should not be empty' })
   date: string = '';
 }
-
 class CommitDto implements Commit {
-  @IsString({ message: 'SHA should be a string' })
-  @IsNotEmpty({ message: 'SHA should not be empty' })
   sha: string = '';
-
-  @IsObject({ message: 'Commit information should be an object' })
-  @ValidateNested({ each: true })
-  @Type(() => CommitAuthorDto)
-  author: CommitAuthorDto = {
-    name: '',
-    email: '',
-    date: '',
-  };
+  commit: {
+    author: {
+      name: string;
+      email: string;
+      date: string;
+    };
+  } = { author: { name: '', email: '', date: '' } };
 }
 
 export { CommitDto, CommitAuthorDto };

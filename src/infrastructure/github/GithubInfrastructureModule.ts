@@ -6,4 +6,4 @@ import { GitHubConnection } from './github/github';
 @Module({
   providers: [GitHubConnection],
 })
-export class GithubModule {}
+export class GithubApplicationModule {}

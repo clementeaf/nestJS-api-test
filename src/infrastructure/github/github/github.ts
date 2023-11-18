@@ -1,13 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
-
-interface RepositoryInfo {
-  name: string;
-}
-
-interface Commit {
-  sha: string;
-}
+import { Commit, RepositoryInfo } from './interfaces';
 
 /**
  * Service responsible for connecting to the GitHub API and fetching repository data.
@@ -52,24 +45,6 @@ export class GitHubConnection {
    * @returns {Promise<Commit[]>} List of commits from the GitHub repository.
    */
   async getCommits(owner: string, repo: string): Promise<Commit[]> {
-    try {
-      const { data } = await this.octokit.request(
-        'GET /repos/{owner}/{repo}/commits',
-        {
-          owner,
-          repo,
-        },
-      );
-      this.logger.log(`Retrieved commits for ${owner}/${repo}`);
-      return data as Commit[];
-    } catch (error) {
-      this.logger.error(`Error fetching commits for ${owner}/${repo}`, error);
-      console.error(error);
-      throw error;
-    }
-  }
-
-  async getCommitsWithDetails(owner: string, repo: string): Promise<any[]> {
     try {
       const { data } = await this.octokit.request(
         'GET /repos/{owner}/{repo}/commits',
