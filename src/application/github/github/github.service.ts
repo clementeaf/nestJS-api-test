@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Subject } from 'rxjs';
 import { GitHubConnection } from '../../../infrastructure/github/github/github';
-import { CommitAuthorDto, CommitDto, RepoInfoDto } from '../dto/github.dto';
+import { CommitDto, RepoInfoDto } from '../dto/github.dto';
 
 @Injectable()
 export class ApplicationGithubService {
@@ -17,7 +17,6 @@ export class ApplicationGithubService {
 
   private readonly owner = 'clementeaf';
   private readonly repo = 'nestJS-api-test';
-  private authorDto = new CommitAuthorDto();
 
   constructor() {
     this.gitHubConnection = new GitHubConnection();
@@ -29,7 +28,7 @@ export class ApplicationGithubService {
    * @throws {NotFoundException} If the repository is not found.
    * @throws {InternalServerErrorException} If an internal server error occurs.
    */
-  async getRepoInfo(): Promise<RepoInfoDto> {
+  async fetchRepositoryInfo(): Promise<RepoInfoDto> {
     try {
       const repoInfo = await this.gitHubConnection.getRepoInfo(
         this.owner,
@@ -64,7 +63,7 @@ export class ApplicationGithubService {
    * @throws {NotFoundException} If commits are not found.
    * @throws {InternalServerErrorException} If an internal server error occurs.
    */
-  async getCommits(): Promise<any[]> {
+  async fetchCommitsFromGithub(): Promise<any[]> {
     try {
       const commits = await this.gitHubConnection.getCommits(
         this.owner,
@@ -109,7 +108,7 @@ export class ApplicationGithubService {
    * @throws {NotFoundException} If commits are not found.
    * @throws {InternalServerErrorException} If an unexpected error occurs.
    */
-  async getCommitsAndNotify(): Promise<CommitDto[]> {
+  async notifyCommitsUpdate(): Promise<CommitDto[]> {
     // GitHub repository information
     const owner = 'clementeaf';
     const repo = 'nestJS-api-test';

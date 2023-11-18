@@ -16,7 +16,7 @@ export class RepoInfoDto implements RepoInfo {
 /**
  * Data transfer object for commit information.
  */
-class CommitAuthorDto implements CommitAuthor {
+export class CommitAuthorDto implements CommitAuthor {
   @IsString({ message: 'Author name should be a string' })
   @IsNotEmpty({ message: 'Author name should not be empty' })
   name: string = '';
@@ -29,7 +29,7 @@ class CommitAuthorDto implements CommitAuthor {
   @IsNotEmpty({ message: 'Author date should not be empty' })
   date: string = '';
 }
-class CommitDto implements Commit {
+export class CommitDto implements Commit {
   sha: string = '';
   commit: {
     author: {
@@ -39,5 +39,3 @@ class CommitDto implements Commit {
     };
   } = { author: { name: '', email: '', date: '' } };
 }
-
-export { CommitDto, CommitAuthorDto };

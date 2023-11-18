@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Get,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Controller, Get, NotFoundException } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -17,6 +12,8 @@ import {
   RepoInfoDto,
 } from '../../application/github/dto/github.dto';
 import { ApplicationGithubService } from '../../application/github/github/github.service';
+import { ApiExcludeEndpoint, ApiResponse } from '@nestjs/swagger';
+import { RepositoryNotFoundException } from '../../application/github/exceptions/RepositoryNotFoundException';
 
 /**
  * Controller responsible for handling Github-related HTTP requests.
@@ -54,25 +51,32 @@ export class GithubController
   setServer(server: Server) {
     this.server = server;
   }
+
   /**
    * Endpoint: GET /github/repo-info
    * Retrieve information about the Github repository.
    * @returns {Promise<RepoInfoDto>} Information about the Github repository.
    */
+  @ApiResponse({
+    status: 200,
+    description: 'Repository information retrieved successfully.',
+    type: RepoInfoDto,
+  })
+  @ApiResponse({ status: 404, description: 'Repository not found.' })
+  @ApiResponse({ status: 500, description: 'Internal server error.' })
   @Get('repo-info')
   async getRepoInfo(): Promise<RepoInfoDto> {
     try {
-      const repoInfo = await this.githubService.getRepoInfo();
+      const repoInfo = await this.githubService.fetchRepositoryInfo();
       if (!repoInfo) {
-        throw new NotFoundException('Repository not found');
+        throw new RepositoryNotFoundException('Repository not found');
       }
       return repoInfo;
     } catch (error) {
-      console.error(error);
       if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.message);
+        throw new RepositoryNotFoundException(error.message);
       } else {
-        throw new InternalServerErrorException(
+        throw new RepositoryNotFoundException(
           'Unexpected error fetching repository information',
         );
       }
@@ -84,26 +88,35 @@ export class GithubController
    * Retrieve a list of commits from the Github repository.
    * @returns {Promise<CommitDto[]>} List of commits from the Github repository.
    */
+  @ApiResponse({
+    status: 200,
+    description: 'Commits retrieved successfully.',
+    type: CommitDto,
+    isArray: true,
+  })
+  @ApiResponse({ status: 404, description: 'Commits not found.' })
+  @ApiResponse({ status: 500, description: 'Internal server error.' })
   @Get('commits')
   async getCommits(): Promise<CommitDto[]> {
     try {
-      const commits = await this.githubService.getCommits();
+      const commits = await this.githubService.fetchCommitsFromGithub();
       if (!commits) {
-        throw new NotFoundException('Commits not found');
+        throw new RepositoryNotFoundException('Commits not found');
       }
       return commits;
     } catch (error) {
       console.error(error);
       if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.message);
+        throw new RepositoryNotFoundException(error.message);
       } else {
-        throw new InternalServerErrorException(
+        throw new RepositoryNotFoundException(
           'Unexpected error fetching commits',
         );
       }
     }
   }
 
+  @ApiExcludeEndpoint()
   @SubscribeMessage('subscribeToCommits')
   handleSubscribeToCommits(client: Socket): void {
     const response = {

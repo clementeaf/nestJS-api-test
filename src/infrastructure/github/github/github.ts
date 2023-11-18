@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
 import { Commit, RepositoryInfo } from './interfaces';
+import { RepositoryNotFoundException } from '../../../application/github/exceptions/RepositoryNotFoundException';
 
 /**
  * Service responsible for connecting to the GitHub API and fetching repository data.
@@ -29,9 +30,15 @@ export class GitHubConnection {
       this.logger.log(`Retrieved repository information for ${owner}/${repo}`);
       return data as RepositoryInfo;
     } catch (error) {
+      if (error instanceof Error && 'status' in error) {
+        if (error.status === 404) {
+          throw new RepositoryNotFoundException('Repository not found');
+        }
+      }
       this.logger.error(
         `Error fetching repository information for ${owner}/${repo}`,
         error,
+        GitHubConnection.name,
       );
       console.error(error);
       throw error;
@@ -56,7 +63,16 @@ export class GitHubConnection {
       this.logger.log(`Retrieved commits for ${owner}/${repo}`);
       return data as Commit[];
     } catch (error) {
-      this.logger.error(`Error fetching commits for ${owner}/${repo}`, error);
+      if (error instanceof Error && 'status' in error) {
+        if (error.status === 404) {
+          throw new RepositoryNotFoundException('Repository not found');
+        }
+      }
+      this.logger.error(
+        `Error fetching repository information for ${owner}/${repo}`,
+        error,
+        GitHubConnection.name,
+      );
       console.error(error);
       throw error;
     }
