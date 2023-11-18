@@ -106,7 +106,9 @@ export class ApplicationGithubService {
         }),
       );
 
-      // Notify the subscribers about the commits update
+      /**
+       * Notify the subscribers about the commits update
+       */
       this.commitsSubject.next(commitsDto);
 
       return commitsDto;
@@ -140,7 +142,9 @@ export class ApplicationGithubService {
     throw new InternalServerErrorException(message);
   }
 
-  // Method to subscribe to commit updates
+  /**
+   * Method to subscribe to commit updates
+   */
   getCommitsUpdates() {
     return this.commitsSubject.asObservable();
   }
