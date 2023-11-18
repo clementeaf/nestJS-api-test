@@ -1,4 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -56,7 +61,22 @@ export class GithubController
    */
   @Get('repo-info')
   async getRepoInfo(): Promise<RepoInfoDto> {
-    return this.githubService.getRepoInfo();
+    try {
+      const repoInfo = await this.githubService.getRepoInfo();
+      if (!repoInfo) {
+        throw new NotFoundException('Repository not found');
+      }
+      return repoInfo;
+    } catch (error) {
+      console.error(error);
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      } else {
+        throw new InternalServerErrorException(
+          'Unexpected error fetching repository information',
+        );
+      }
+    }
   }
 
   /**
@@ -66,7 +86,27 @@ export class GithubController
    */
   @Get('commits')
   async getCommits(): Promise<CommitDto[]> {
-    return this.githubService.getCommits();
+    try {
+      const commits = await this.githubService.getCommits();
+      if (!commits) {
+        throw new NotFoundException('Commits not found');
+      }
+      return commits;
+    } catch (error) {
+      console.error(error);
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      } else {
+        throw new InternalServerErrorException(
+          'Unexpected error fetching commits',
+        );
+      }
+    }
+  }
+
+  @Get('commits-with-details')
+  async getCommitsWithDetails(): Promise<any[]> {
+    return this.githubService.getCommitsWithDetails();
   }
 
   @SubscribeMessage('subscribeToCommits')

@@ -7,12 +7,20 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { GitHubConnection } from '../../infrastructure/github/github/github';
-import { CommitDto, RepoInfoDto } from './github.dto/github.dto';
+import {
+  CommitAuthorDto,
+  CommitDto,
+  RepoInfoDto,
+} from './github.dto/github.dto';
 import { Subject } from 'rxjs';
 @Injectable()
 export class ApplicationGithubService {
   private readonly gitHubConnection: GitHubConnection;
   private commitsSubject = new Subject<CommitDto[]>();
+
+  private readonly owner = 'clementeaf';
+  private readonly repo = 'nestJS-api-test';
+  private authorDto = new CommitAuthorDto();
 
   constructor() {
     this.gitHubConnection = new GitHubConnection();
@@ -25,11 +33,11 @@ export class ApplicationGithubService {
    * @throws {InternalServerErrorException} If an internal server error occurs.
    */
   async getRepoInfo(): Promise<RepoInfoDto> {
-    const owner = 'clementeaf';
-    const repo = 'nestJS-api-test';
-
     try {
-      const repoInfo = await this.gitHubConnection.getRepoInfo(owner, repo);
+      const repoInfo = await this.gitHubConnection.getRepoInfo(
+        this.owner,
+        this.repo,
+      );
 
       if (!repoInfo) {
         throw new NotFoundException('Repository not found');
@@ -60,21 +68,24 @@ export class ApplicationGithubService {
    * @throws {InternalServerErrorException} If an internal server error occurs.
    */
   async getCommits(): Promise<CommitDto[]> {
-    const owner = 'clementeaf';
-    const repo = 'nestJS-api-test';
-
     try {
-      const commits = await this.gitHubConnection.getCommits(owner, repo);
+      const commits = await this.gitHubConnection.getCommits(
+        this.owner,
+        this.repo,
+      );
 
       if (!commits) {
         throw new NotFoundException('Commits not found');
       }
 
-      const commitsDto: CommitDto[] = commits.map(
-        (commit: { sha: string }) => ({
-          sha: commit.sha,
-        }),
-      );
+      const commitsDto: CommitDto[] = commits.map((commit) => ({
+        sha: commit.sha,
+        author: {
+          name: this.authorDto.name,
+          email: this.authorDto.email,
+          date: this.authorDto.date,
+        },
+      }));
 
       return commitsDto;
     } catch (error) {
@@ -94,17 +105,25 @@ export class ApplicationGithubService {
     const owner = 'clementeaf';
     const repo = 'nestJS-api-test';
     try {
-      const commits = await this.gitHubConnection.getCommits(owner, repo);
+      const commits = await this.gitHubConnection.getCommits(
+        this.owner,
+        this.repo,
+      );
 
       if (!commits) {
         throw new NotFoundException('Commits not found');
       }
 
-      const commitsDto: CommitDto[] = commits.map(
-        (commit: { sha: string }) => ({
-          sha: commit.sha,
-        }),
-      );
+      const authorDto = new CommitAuthorDto();
+
+      const commitsDto: CommitDto[] = commits.map((commit) => ({
+        sha: commit.sha,
+        author: {
+          name: this.authorDto.name,
+          email: this.authorDto.email,
+          date: this.authorDto.date,
+        },
+      }));
 
       /**
        * Notify the subscribers about the commits update
@@ -120,6 +139,32 @@ export class ApplicationGithubService {
       } else {
         throw new InternalServerErrorException(
           'Unexpected error fetching commits',
+        );
+      }
+    }
+  }
+
+  //Solo prueba
+  async getCommitsWithDetails(): Promise<any[]> {
+    try {
+      const commits = await this.gitHubConnection.getCommitsWithDetails(
+        this.owner,
+        this.repo,
+      );
+
+      if (!commits) {
+        throw new NotFoundException('Commits not found');
+      }
+
+      return commits;
+    } catch (error) {
+      console.error(error);
+
+      if (error instanceof Error) {
+        this.handleError(error, 'Error fetching commits with details');
+      } else {
+        throw new InternalServerErrorException(
+          'Unexpected error fetching commits with details',
         );
       }
     }

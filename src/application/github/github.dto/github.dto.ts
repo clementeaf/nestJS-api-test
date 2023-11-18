@@ -1,9 +1,16 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsNotEmpty,
+  IsObject,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { RepoInfo, CommitAuthor, Commit } from './interfaces.dto';
 
 /**
  * Data transfer object for repository information.
  */
-export class RepoInfoDto {
+export class RepoInfoDto implements RepoInfo {
   /**
    * The name of the repository.
    */
@@ -15,30 +22,33 @@ export class RepoInfoDto {
 /**
  * Data transfer object for commit information.
  */
-export class CommitDto {
-  /**
-   * The SHA (Secure Hash Algorithm) of the commit.
-   */
+class CommitAuthorDto implements CommitAuthor {
+  @IsString({ message: 'Author name should be a string' })
+  @IsNotEmpty({ message: 'Author name should not be empty' })
+  name: string = '';
+
+  @IsString({ message: 'Author email should be a string' })
+  @IsNotEmpty({ message: 'Author email should not be empty' })
+  email: string = '';
+
+  @IsString({ message: 'Author date should be a string' })
+  @IsNotEmpty({ message: 'Author date should not be empty' })
+  date: string = '';
+}
+
+class CommitDto implements Commit {
   @IsString({ message: 'SHA should be a string' })
   @IsNotEmpty({ message: 'SHA should not be empty' })
   sha: string = '';
+
+  @IsObject({ message: 'Commit information should be an object' })
+  @ValidateNested({ each: true })
+  @Type(() => CommitAuthorDto)
+  author: CommitAuthorDto = {
+    name: '',
+    email: '',
+    date: '',
+  };
 }
 
-/**
- * Data transfer object for creating a new commit.
- */
-export class CreateCommitDto {
-  /**
-   * The commit message.
-   */
-  @IsString({ message: 'Message should be a string' })
-  @IsNotEmpty({ message: 'Message should not be empty' })
-  message: string = '';
-
-  /**
-   * The author of the commit.
-   */
-  @IsString({ message: 'Author should be a string' })
-  @IsNotEmpty({ message: 'Author should not be empty' })
-  author: string = '';
-}
+export { CommitDto, CommitAuthorDto };

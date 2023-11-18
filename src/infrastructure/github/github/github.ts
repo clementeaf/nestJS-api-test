@@ -68,4 +68,22 @@ export class GitHubConnection {
       throw error;
     }
   }
+
+  async getCommitsWithDetails(owner: string, repo: string): Promise<any[]> {
+    try {
+      const { data } = await this.octokit.request(
+        'GET /repos/{owner}/{repo}/commits',
+        {
+          owner,
+          repo,
+        },
+      );
+      this.logger.log(`Retrieved commits for ${owner}/${repo}`);
+      return data as Commit[];
+    } catch (error) {
+      this.logger.error(`Error fetching commits for ${owner}/${repo}`, error);
+      console.error(error);
+      throw error;
+    }
+  }
 }
