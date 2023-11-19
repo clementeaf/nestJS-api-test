@@ -7,8 +7,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Subject } from 'rxjs';
-import { GitHubConnection } from '../../../infrastructure/github/github/github';
 import { CommitDto, RepoInfoDto } from '../dto/github.dto';
+import { Commit } from '../dto/interfaces.dto';
+import { GitHubConnection } from '../../../infrastructure/github-connection.service';
 
 @Injectable()
 export class ApplicationGithubService {
@@ -41,6 +42,16 @@ export class ApplicationGithubService {
 
       const repoInfoDto: RepoInfoDto = {
         name: repoInfo.name,
+        owner: {
+          login: repoInfo.owner.login,
+          url: repoInfo.owner.url,
+        },
+        html_url: repoInfo.html_url,
+        created_at: repoInfo.created_at,
+        updated_at: repoInfo.updated_at,
+        language: repoInfo.language,
+        visibility: repoInfo.visibility,
+        default_branch: repoInfo.default_branch,
       };
 
       return repoInfoDto;
@@ -63,7 +74,7 @@ export class ApplicationGithubService {
    * @throws {NotFoundException} If commits are not found.
    * @throws {InternalServerErrorException} If an internal server error occurs.
    */
-  async fetchCommitsFromGithub(): Promise<any[]> {
+  async fetchCommitsFromGithub(): Promise<Commit[]> {
     try {
       const commits = await this.gitHubConnection.getCommits(
         this.owner,
@@ -82,6 +93,7 @@ export class ApplicationGithubService {
               email: commit.commit.author.email,
               date: commit.commit.author.date,
             },
+            message: commit.commit.message,
           },
         } as CommitDto;
       });

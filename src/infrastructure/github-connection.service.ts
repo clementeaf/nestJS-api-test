@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
-import { Commit, RepositoryInfo } from './interfaces';
-import { RepositoryNotFoundException } from '../../../application/github/exceptions/RepositoryNotFoundException';
+import { Commit, RepoInfo } from '../application/github/dto/interfaces.dto';
+import { RepositoryNotFoundException } from '../application/github/exceptions/RepositoryNotFoundException';
 
 /**
  * Service responsible for connecting to the GitHub API and fetching repository data.
@@ -12,7 +12,9 @@ export class GitHubConnection {
   private readonly logger = new Logger(GitHubConnection.name);
 
   constructor() {
-    this.octokit = new Octokit();
+    this.octokit = new Octokit({
+      auth: process.env.GITHUB_ACCESS_TOKEN,
+    });
   }
 
   /**
@@ -21,14 +23,14 @@ export class GitHubConnection {
    * @param {string} repo - Name of the repository.
    * @returns {Promise<RepositoryInfo>} Information about the GitHub repository.
    */
-  async getRepoInfo(owner: string, repo: string): Promise<RepositoryInfo> {
+  async getRepoInfo(owner: string, repo: string): Promise<RepoInfo> {
     try {
       const { data } = await this.octokit.request('GET /repos/{owner}/{repo}', {
         owner,
         repo,
       });
       this.logger.log(`Retrieved repository information for ${owner}/${repo}`);
-      return data as RepositoryInfo;
+      return data as RepoInfo;
     } catch (error) {
       if (error instanceof Error && 'status' in error) {
         if (error.status === 404) {

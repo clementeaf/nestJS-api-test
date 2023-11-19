@@ -11,7 +11,7 @@ import {
   CommitDto,
   RepoInfoDto,
 } from '../../application/github/dto/github.dto';
-import { ApplicationGithubService } from '../../application/github/github/github.service';
+import { ApplicationGithubService } from '../../application/github/githubAppService/github.service';
 import { ApiExcludeEndpoint, ApiResponse } from '@nestjs/swagger';
 import { RepositoryNotFoundException } from '../../application/github/exceptions/RepositoryNotFoundException';
 

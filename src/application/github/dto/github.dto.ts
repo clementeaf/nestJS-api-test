@@ -1,16 +1,43 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsObject,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { RepoInfo, CommitAuthor, Commit } from './interfaces.dto';
 
 /**
  * Data transfer object for repository information.
  */
 export class RepoInfoDto implements RepoInfo {
-  /**
-   * The name of the repository.
-   */
   @IsString({ message: 'Name should be a string' })
   @IsNotEmpty({ message: 'Name should not be empty' })
   name: string = '';
+
+  @IsObject()
+  @ValidateNested()
+  owner!: {
+    login: string;
+    url: string;
+  };
+
+  @IsString({ message: 'HTML URL should be a string' })
+  html_url!: string;
+
+  @IsString({ message: 'Created at should be a string' })
+  created_at!: string;
+
+  @IsString({ message: 'Updated at should be a string' })
+  updated_at!: string;
+
+  @IsString({ message: 'Language should be a string' })
+  language!: string;
+
+  @IsString({ message: 'Visibility should be a string' })
+  visibility!: string;
+
+  @IsString({ message: 'Default branch should be a string' })
+  default_branch!: string;
 }
 
 /**
@@ -37,5 +64,9 @@ export class CommitDto implements Commit {
       email: string;
       date: string;
     };
-  } = { author: { name: '', email: '', date: '' } };
+    message: string;
+  } = {
+    author: { name: '', email: '', date: '' },
+    message: '',
+  };
 }
