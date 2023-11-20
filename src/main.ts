@@ -27,7 +27,7 @@ async function bootstrap() {
 
   // Enable CORS with specific origins, methods, and credentials
   app.enableCors({
-    origin: ['http://localhost:4000', 'https://react-monitoring-e49b2.web.app'],
+    origin: ['http://localhost:4000', 'https://monitoring-front.onrender.com/'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
