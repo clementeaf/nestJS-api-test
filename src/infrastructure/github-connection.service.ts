@@ -1,3 +1,4 @@
+import fetch from 'node-fetch';
 import { Injectable, Logger } from '@nestjs/common';
 import { Octokit } from '@octokit/core';
 import { Commit, RepoInfo } from '../application/github/dto/interfaces.dto';
@@ -14,6 +15,9 @@ export class GitHubConnection {
   constructor() {
     this.octokit = new Octokit({
       auth: process.env.GITHUB_ACCESS_TOKEN,
+      request: {
+        fetch,
+      },
     });
   }
 
